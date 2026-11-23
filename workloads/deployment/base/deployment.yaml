@@ -3,18 +3,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: busybox
+  labels:
+    role: writer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      appname: busybox
+      workload: busybox
   template:
     metadata:
       labels:
-        appname: busybox
+        workload: busybox
+        role: writer
     spec:
       containers:
-        - name: logger
+        - name: writer
           image: quay.io/nirsof/busybox:stable
           imagePullPolicy: IfNotPresent
           command:
@@ -22,7 +25,7 @@ spec:
             - -c
             - |
               emit() {
-                  echo "$(date) $1" | tee -a /var/log/ramen.log
+                  echo "$(date) $1" >> /data/ramen.log
                   sync
               }
               trap "emit STOP; exit" TERM
@@ -32,9 +35,206 @@ spec:
                   emit UPDATE
               done
           volumeMounts:
-            - name: varlog
-              mountPath: /var/log
+            - name: data
+              mountPath: /data
       volumes:
-        - name: varlog
+        - name: data
           persistentVolumeClaim:
             claimName: busybox-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: writer-2
+  labels:
+    role: writer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload: writer-2
+  template:
+    metadata:
+      labels:
+        workload: writer-2
+        role: writer
+    spec:
+      containers:
+        - name: writer
+          image: quay.io/nirsof/busybox:stable
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              emit() {
+                  echo "$(date) $1" >> /data/ramen.log
+                  sync
+              }
+              trap "emit STOP; exit" TERM
+              emit START
+              while true; do
+                  sleep 10 & wait
+                  emit UPDATE
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: writer-pvc-2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: writer-3
+  labels:
+    role: writer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload: writer-3
+  template:
+    metadata:
+      labels:
+        workload: writer-3
+        role: writer
+    spec:
+      containers:
+        - name: writer
+          image: quay.io/nirsof/busybox:stable
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              emit() {
+                  echo "$(date) $1" >> /data/ramen.log
+                  sync
+              }
+              trap "emit STOP; exit" TERM
+              emit START
+              while true; do
+                  sleep 10 & wait
+                  emit UPDATE
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: writer-pvc-3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idle-1
+  labels:
+    role: idle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload: idle-1
+  template:
+    metadata:
+      labels:
+        workload: idle-1
+        role: idle
+    spec:
+      containers:
+        - name: idle
+          image: quay.io/nirsof/busybox:stable
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              trap "exit" TERM
+              while true; do
+                  sleep 3600 & wait
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: idle-pvc-1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idle-2
+  labels:
+    role: idle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload: idle-2
+  template:
+    metadata:
+      labels:
+        workload: idle-2
+        role: idle
+    spec:
+      containers:
+        - name: idle
+          image: quay.io/nirsof/busybox:stable
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              trap "exit" TERM
+              while true; do
+                  sleep 3600 & wait
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: idle-pvc-2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idle-3
+  labels:
+    role: idle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      workload: idle-3
+  template:
+    metadata:
+      labels:
+        workload: idle-3
+        role: idle
+    spec:
+      containers:
+        - name: idle
+          image: quay.io/nirsof/busybox:stable
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              trap "exit" TERM
+              while true; do
+                  sleep 3600 & wait
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: idle-pvc-3

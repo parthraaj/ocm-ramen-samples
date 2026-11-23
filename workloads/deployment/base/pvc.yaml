@@ -6,8 +6,67 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  # Customize in your overlay.
-  storageClassName: STORAGE_CLASS_NAME
+  storageClassName: sc-basic-rw-partition-dr
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: writer-pvc-2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: sc-basic-rw-partition-dr
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: writer-pvc-3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: sc-basic-rw-partition-dr
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: idle-pvc-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: sc-basic-rw-partition-dr
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: idle-pvc-2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: sc-basic-rw-partition-dr
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: idle-pvc-3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: sc-basic-rw-partition-dr
   resources:
     requests:
       storage: 1Gi
